@@ -9,6 +9,8 @@ PLAYERS: list[Player] = []
 TABLES: list[Table] = []
 TABLES_HISTORY: list[Table] = []
 
+TOTAL_SCORE = 4 * 30000
+
 # init tkinter
 root = Tk()
 root.title("🀄 RonRunner - Mahjong Tournament Scoring 🀄")
@@ -142,7 +144,11 @@ btn_create_table.grid(column=1, row=len(PLAYERS) + 2, padx=10, pady=20)
 def refreshUi():
     # remove old labels
     for widget in frm.winfo_children():
-        if widget not in [entry_player_name, btn_player_name]:
+        if widget not in [
+            entry_player_name,
+            btn_player_name,
+            btn_create_table
+        ]:
             info = widget.grid_info()
             if info.get('row', 0) > 0 and info.get('row', 0) < 100:
                 widget.destroy()
@@ -185,11 +191,20 @@ def refreshUi():
     ttk.Label(frm, text="Tables", font=("Helvetica", 12, "bold")).grid(column=0, row=len(PLAYERS) + 3, columnspan=3, padx=10, pady=20)
 
     for i, table in enumerate(TABLES):
-        nbCol = 3
+        nbCol = 4
         col = i % nbCol
         row = len(PLAYERS) + 4 + (i // nbCol)
 
-        tableFrame = ttk.LabelFrame(frm, text=f"Table {i+1}", padding=10)
+        style = ttk.Style()
+        style.theme_use('clam')
+
+        if (table.s1 + table.s2 + table.s3 + table.s4 != TOTAL_SCORE):
+            colour = "#F13C3C"
+        else:
+            colour = "#3CEB2C"
+        style.configure("Table.TLabelframe", borderwidth=2, relief="solid", bordercolor=colour)
+
+        tableFrame = ttk.LabelFrame(frm, text=f"Table {i+1}", padding=10, style="Table.TLabelframe")
         tableFrame.grid(column=col, row=row, padx=10, pady=10, sticky="ew")
 
         ttk.Label(tableFrame, text=table.p1.name, font=("Helvetica", 9)).pack()
@@ -197,8 +212,87 @@ def refreshUi():
         ttk.Label(tableFrame, text=table.p3.name, font=("Helvetica", 9)).pack()
         ttk.Label(tableFrame, text=table.p4.name, font=("Helvetica", 9)).pack()
 
+        def onClick(event, table=table):
+            popup = Toplevel(root)
+            popup.title(f"Edit table")
+            popup.geometry("300x250")
+
+            p1_var = StringVar(value=table.p1.name)
+            p2_var = StringVar(value=table.p2.name)
+            p3_var = StringVar(value=table.p3.name)
+            p4_var = StringVar(value=table.p4.name)
+
+            # names list
+            names = [p.name for p in PLAYERS]
+
+            ttk.Label(popup, text="Player 1", font=("Helvetica", 10)).grid(column=0, row=0, padx=10, pady=10)
+            combo1 = ttk.Combobox(popup, textvariable=p1_var, values=names, state="readonly", width=25)
+            combo1.grid(column=1, row=0, padx=10, pady=5)
+            entry1 = ttk.Entry(popup, width=30, font=("Helvetica", 10))
+            entry1.insert(0, table.s1)
+            entry1.grid(column=2, row=0, padx=10, pady=10)
+
+            ttk.Label(popup, text="Player 2", font=("Helvetica", 10)).grid(column=0, row=1, padx=10, pady=10)
+            combo2 = ttk.Combobox(popup, textvariable=p2_var, values=names, state="readonly", width=25)
+            combo2.grid(column=1, row=1, padx=10, pady=5)
+            entry2 = ttk.Entry(popup, width=30, font=("Helvetica", 10))
+            entry2.insert(0, table.s2)
+            entry2.grid(column=2, row=1, padx=10, pady=10)
+
+            ttk.Label(popup, text="Player 3", font=("Helvetica", 10)).grid(column=0, row=2, padx=10, pady=10)
+            combo3 = ttk.Combobox(popup, textvariable=p3_var, values=names, state="readonly", width=25)
+            combo3.grid(column=1, row=2, padx=10, pady=5)
+            entry3 = ttk.Entry(popup, width=30, font=("Helvetica", 10))
+            entry3.insert(0, table.s3)
+            entry3.grid(column=2, row=2, padx=10, pady=10)
+
+            ttk.Label(popup, text="Player 4", font=("Helvetica", 10)).grid(column=0, row=3, padx=10, pady=10)
+            combo4 = ttk.Combobox(popup, textvariable=p4_var, values=names, state="readonly", width=25)
+            combo4.grid(column=1, row=3, padx=10, pady=5)
+            entry4 = ttk.Entry(popup, width=30, font=("Helvetica", 10))
+            entry4.insert(0, table.s4)
+            entry4.grid(column=2, row=3, padx=10, pady=10)
+
+            def changeTable():
+                p1_name = p1_var.get()
+                p2_name = p2_var.get()
+                p3_name = p3_var.get()
+                p4_name = p4_var.get()
+
+                try:
+                    s1 = int(entry1.get())
+                    s2 = int(entry2.get())
+                    s3 = int(entry3.get())
+                    s4 = int(entry4.get())
+                except:
+                    return
+
+                if p1_name != "Select player 1" and p2_name != "Select player 2" and p3_name != "Select player 3" and p4_name != "Select player 4":
+                    p1 = next((p for p in PLAYERS if p.name == p1_name), None)
+                    p2 = next((p for p in PLAYERS if p.name == p2_name), None)
+                    p3 = next((p for p in PLAYERS if p.name == p3_name), None)
+                    p4 = next((p for p in PLAYERS if p.name == p4_name), None)
+
+                    if len(set([p1, p2, p3, p4])) == 4:
+                        table.p1 = p1
+                        table.p2 = p2
+                        table.p3 = p3
+                        table.p4 = p4
+
+                        table.s1 = s1
+                        table.s2 = s2
+                        table.s3 = s3
+                        table.s4 = s4
+                        cancelTopLevel(popup)
+            
+            ttk.Button(popup, text="✓ Ok", command=changeTable).grid(column=1, row=4, padx=10, pady=20)
+            ttk.Button(popup, text="✕ Cancel", command=lambda : cancelTopLevel(popup)).grid(column=2, row=4, padx=10, pady=20)
+
+        tableFrame.bind("<Button-1>", onClick)
+        for child in tableFrame.winfo_children():
+            child.bind("<Button-1>", onClick)
+
     # adding table
-    btn_create_table = ttk.Button(frm, text="➕ Create table", command=addTable)
     btn_create_table.grid(column=1, row=len(PLAYERS) + 2, padx=10, pady=20)
 
 def cancelTopLevel(tl: Toplevel):

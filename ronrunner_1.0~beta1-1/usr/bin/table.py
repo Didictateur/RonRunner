@@ -6,3 +6,8 @@ class Table:
         self.p2 = p2
         self.p3 = p3
         self.p4 = p4
+
+        self.s1 = 0
+        self.s2 = 0
+        self.s3 = 0
+        self.s4 = 0
