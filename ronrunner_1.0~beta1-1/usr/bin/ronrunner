@@ -3,9 +3,11 @@ from tkinter import *
 from tkinter import ttk
 
 from player import Player
-from game import Game
+from table import Table
 
 PLAYERS: list[Player] = []
+TABLES: list[Table] = []
+TABLES_HISTORY: list[Table] = []
 
 # init tkinter
 root = Tk()
@@ -68,16 +70,70 @@ entry_player_name.grid(column=1, row=len(PLAYERS) + 1, padx=10, pady=10)
 # adding player
 def addPlayer(entry: Entry):
     txt = entry.get()
-    if txt:
+    if txt and not txt in [p.name for p in PLAYERS]:
         PLAYERS.append(Player(txt))
         entry.delete(0, END)
         refreshUi()
 
 btn_player_name = ttk.Button(frm, text="➕ Add", command=lambda : addPlayer(entry_player_name))
-btn_player_name.grid(column=2, row=1 + len(PLAYERS), padx=10, pady=10)
+btn_player_name.grid(column=2, row=len(PLAYERS) + 1, padx=10, pady=10)
 
 # tables
-# TODO
+
+# show tables
+
+
+# create table
+def addTable():
+    popup = Toplevel(root)
+    popup.title("Create a new table")
+    popup.geometry("300x250")
+
+    p1_var = StringVar(value="Select player 1")
+    p2_var = StringVar(value="Select player 2")
+    p3_var = StringVar(value="Select player 3")
+    p4_var = StringVar(value="Select player 4")
+
+    # names list
+    names = [p.name for p in PLAYERS]
+
+    ttk.Label(popup, text="Player 1", font=("Helvetica", 10)).grid(column=0, row=0, padx=10, pady=10)
+    combo1 = ttk.Combobox(popup, textvariable=p1_var, values=names, state="readonly", width=25)
+    combo1.grid(column=1, row=0, padx=10, pady=5)
+
+    ttk.Label(popup, text="Player 2", font=("Helvetica", 10)).grid(column=0, row=1, padx=10, pady=10)
+    combo2 = ttk.Combobox(popup, textvariable=p2_var, values=names, state="readonly", width=25)
+    combo2.grid(column=1, row=1, padx=10, pady=5)
+
+    ttk.Label(popup, text="Player 3", font=("Helvetica", 10)).grid(column=0, row=2, padx=10, pady=10)
+    combo3 = ttk.Combobox(popup, textvariable=p3_var, values=names, state="readonly", width=25)
+    combo3.grid(column=1, row=2, padx=10, pady=5)
+
+    ttk.Label(popup, text="Player 4", font=("Helvetica", 10)).grid(column=0, row=3, padx=10, pady=10)
+    combo4 = ttk.Combobox(popup, textvariable=p4_var, values=names, state="readonly", width=25)
+    combo4.grid(column=1, row=3, padx=10, pady=5)
+
+    def createTable():
+        p1_name = p1_var.get()
+        p2_name = p2_var.get()
+        p3_name = p3_var.get()
+        p4_name = p4_var.get()
+
+        if p1_name != "Select player 1" and p2_name != "Select player 2" and p3_name != "Select player 3" and p4_name != "Select player 4":
+            p1 = next((p for p in PLAYERS if p.name == p1_name), None)
+            p2 = next((p for p in PLAYERS if p.name == p2_name), None)
+            p3 = next((p for p in PLAYERS if p.name == p3_name), None)
+            p4 = next((p for p in PLAYERS if p.name == p4_name), None)
+
+            if len(set([p1, p2, p3, p4])) == 4:
+                TABLES.append(Table(p1, p2, p3, p4))
+                cancelTopLevel(popup)
+    
+    ttk.Button(popup, text="✓ Create", command=createTable).grid(column=1, row=4, padx=10, pady=20)
+    ttk.Button(popup, text="✕ Cancel", command=lambda : cancelTopLevel(popup)).grid(column=2, row=4, padx=10, pady=20)
+
+btn_create_table = ttk.Button(frm, text="➕ Create table", command=addTable)
+btn_create_table.grid(column=1, row=len(PLAYERS) + 2, padx=10, pady=20)
 
 # table history
 # TODO
@@ -123,10 +179,31 @@ def refreshUi():
 
     # adding player
     entry_player_name.grid(column=1, row=len(PLAYERS) + 1)
-    btn_player_name.grid(column=2, row=1 + len(PLAYERS))
+    btn_player_name.grid(column=2, row=len(PLAYERS) + 1)
+
+    # show tables
+    ttk.Label(frm, text="Tables", font=("Helvetica", 12, "bold")).grid(column=0, row=len(PLAYERS) + 3, columnspan=3, padx=10, pady=20)
+
+    for i, table in enumerate(TABLES):
+        nbCol = 3
+        col = i % nbCol
+        row = len(PLAYERS) + 4 + (i // nbCol)
+
+        tableFrame = ttk.LabelFrame(frm, text=f"Table {i+1}", padding=10)
+        tableFrame.grid(column=col, row=row, padx=10, pady=10, sticky="ew")
+
+        ttk.Label(tableFrame, text=table.p1.name, font=("Helvetica", 9)).pack()
+        ttk.Label(tableFrame, text=table.p2.name, font=("Helvetica", 9)).pack()
+        ttk.Label(tableFrame, text=table.p3.name, font=("Helvetica", 9)).pack()
+        ttk.Label(tableFrame, text=table.p4.name, font=("Helvetica", 9)).pack()
+
+    # adding table
+    btn_create_table = ttk.Button(frm, text="➕ Create table", command=addTable)
+    btn_create_table.grid(column=1, row=len(PLAYERS) + 2, padx=10, pady=20)
 
 def cancelTopLevel(tl: Toplevel):
     tl.destroy()
     refreshUi()
 
+refreshUi()
 root.mainloop()
