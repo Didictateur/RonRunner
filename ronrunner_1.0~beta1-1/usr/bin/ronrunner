@@ -5,8 +5,83 @@ from tkinter import ttk
 from player import Player
 from game import Game
 
+PLAYERS: list[Player] = []
+
+# init tkinter
 root = Tk()
 frm = ttk.Frame(root, padding=10)
 frm.grid()
+
+# init ui
+
+# players
+ttk.Label(frm, text="Rank").grid(column=0, row=0)
+ttk.Label(frm, text="Player").grid(column=1, row=0)
+ttk.Label(frm, text="Score").grid(column=2, row=0)
+
+entry_player_name = ttk.Entry(frm, width=30)
+entry_player_name.grid(column=1, row=len(PLAYERS) + 1)
+
+# adding player
+def addPlayer(entry: Entry):
+    txt = entry.get()
+    if txt:
+        PLAYERS.append(Player(txt))
+        entry.delete(0, END)
+        refreshUi()
+
+btn_player_name = ttk.Button(frm, text="Add", command=lambda : addPlayer(entry_player_name))
+btn_player_name.grid(column=2, row=1 + len(PLAYERS))
+
+# tables
+# TODO
+
+# table history
+# TODO
+
+# refresh ui
+def refreshUi():
+    # remove old labels
+    for widget in frm.winfo_children():
+        if widget not in [entry_player_name, btn_player_name]:
+            info = widget.grid_info()
+            if info.get('row', 0) > 0 and info.get('row', 0) < 100:
+                widget.destroy()
+
+    # show players
+    PLAYERS.sort(key=lambda p : p.score, reverse=True)
+    for i in range(len(PLAYERS)):
+        ttk.Label(frm, text=f"{i+1}").grid(column=0, row=i+1)
+        playerLabel = ttk.Label(frm, text=PLAYERS[i].name)
+        playerLabel.grid(column=1, row=i+1)
+        ttk.Label(frm, text=f"{PLAYERS[i].score}").grid(column=2, row=i+1)
+
+        # change player name
+        def onClick(event, player=PLAYERS[i]):
+            popup = Toplevel(root)
+            
+            entry = ttk.Entry(popup, width=30)
+            entry.insert(0, player.name)
+            entry.grid(column=0, row=0)
+
+            def changeName():
+                name = entry.get()
+                if name and not name in [p.name for p in PLAYERS]:
+                    player.name = name
+                    entry.delete(0, END)
+                    cancelTopLevel(popup)
+
+            ttk.Button(popup, text="Change", command=changeName).grid(column=1, row=0)
+            ttk.Button(popup, text="Cancel", command=lambda : cancelTopLevel(popup)).grid(column=2, row=0)
+
+        playerLabel.bind("<Button-1>", onClick)
+
+    # adding player
+    entry_player_name.grid(column=1, row=len(PLAYERS) + 1)
+    btn_player_name.grid(column=2, row=1 + len(PLAYERS))
+
+def cancelTopLevel(tl: Toplevel):
+    tl.destroy()
+    refreshUi()
 
 root.mainloop()
