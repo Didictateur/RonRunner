@@ -1,1 +1,3 @@
 # RonRunner
+
+Riichi tournament manager
