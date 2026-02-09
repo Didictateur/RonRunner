@@ -1,0 +1,8 @@
+Package: ronrunner
+Version: 1.0~beta1-1
+Section: utils
+Priority: optional
+Architecture: all
+Depends: python3
+Maintainer: Didictateur
+Description: RonRunner
