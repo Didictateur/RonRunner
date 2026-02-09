@@ -7,9 +7,12 @@ from table import Table
 
 PLAYERS: list[Player] = []
 TABLES: list[Table] = []
-TABLES_HISTORY: list[Table] = []
 
-TOTAL_SCORE = 4 * 30000
+INITIAL_SCORE = 30000
+UMA1 = 15000
+UMA2 = 5000
+UMA3 = -5000
+UMA4 = -15000
 
 # init tkinter
 root = Tk()
@@ -128,7 +131,7 @@ def addTable():
             p4 = next((p for p in PLAYERS if p.name == p4_name), None)
 
             if len(set([p1, p2, p3, p4])) == 4:
-                TABLES.append(Table(p1, p2, p3, p4))
+                TABLES.append(Table(p1, p2, p3, p4, INITIAL_SCORE))
                 cancelTopLevel(popup)
     
     ttk.Button(popup, text="✓ Create", command=createTable).grid(column=1, row=4, padx=10, pady=20)
@@ -142,6 +145,9 @@ btn_create_table.grid(column=1, row=len(PLAYERS) + 2, padx=10, pady=20)
 
 # refresh ui
 def refreshUi():
+    # update scores
+    updateScore()
+
     # remove old labels
     for widget in frm.winfo_children():
         if widget not in [
@@ -198,8 +204,10 @@ def refreshUi():
         style = ttk.Style()
         style.theme_use('clam')
 
-        if (table.s1 + table.s2 + table.s3 + table.s4 != TOTAL_SCORE):
+        if (table.s1 + table.s2 + table.s3 + table.s4 != 4 * INITIAL_SCORE):
             colour = "#F13C3C"
+        elif ([table.s1, table.s2, table.s3, table.s4] == [INITIAL_SCORE] * 4):
+            colour = "#F1933C"
         else:
             colour = "#3CEB2C"
         style.configure("Table.TLabelframe", borderwidth=2, relief="solid", bordercolor=colour)
@@ -207,10 +215,10 @@ def refreshUi():
         tableFrame = ttk.LabelFrame(frm, text=f"Table {i+1}", padding=10, style="Table.TLabelframe")
         tableFrame.grid(column=col, row=row, padx=10, pady=10, sticky="ew")
 
-        ttk.Label(tableFrame, text=table.p1.name, font=("Helvetica", 9)).pack()
-        ttk.Label(tableFrame, text=table.p2.name, font=("Helvetica", 9)).pack()
-        ttk.Label(tableFrame, text=table.p3.name, font=("Helvetica", 9)).pack()
-        ttk.Label(tableFrame, text=table.p4.name, font=("Helvetica", 9)).pack()
+        ttk.Label(tableFrame, text=f"{table.p1.name} : {table.s1}", font=("Helvetica", 9)).pack()
+        ttk.Label(tableFrame, text=f"{table.p2.name} : {table.s2}", font=("Helvetica", 9)).pack()
+        ttk.Label(tableFrame, text=f"{table.p3.name} : {table.s3}", font=("Helvetica", 9)).pack()
+        ttk.Label(tableFrame, text=f"{table.p4.name} : {table.s4}", font=("Helvetica", 9)).pack()
 
         def onClick(event, table=table):
             popup = Toplevel(root)
@@ -298,6 +306,24 @@ def refreshUi():
 def cancelTopLevel(tl: Toplevel):
     tl.destroy()
     refreshUi()
+
+def updateScore():
+    for p in PLAYERS:
+        p.score = 0
+
+    for t in TABLES:
+        scores = [
+            (t.p1, t.s1),
+            (t.p2, t.s2),
+            (t.p3, t.s3),
+            (t.p4, t.s4)
+        ]
+        scores.sort(key=lambda c : c[1], reverse=True)
+        
+        scores[0][0].score += scores[0][1] + UMA1 - INITIAL_SCORE
+        scores[1][0].score += scores[1][1] + UMA2 - INITIAL_SCORE
+        scores[2][0].score += scores[2][1] + UMA3 - INITIAL_SCORE
+        scores[3][0].score += scores[3][1] + UMA4 - INITIAL_SCORE
 
 refreshUi()
 root.mainloop()

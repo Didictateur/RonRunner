@@ -1,13 +1,13 @@
 from player import Player
 
 class Table:
-    def __init__(self, p1: Player, p2: Player, p3: Player, p4: Player):
+    def __init__(self, p1: Player, p2: Player, p3: Player, p4: Player, initalScore):
         self.p1 = p1
         self.p2 = p2
         self.p3 = p3
         self.p4 = p4
 
-        self.s1 = 0
-        self.s2 = 0
-        self.s3 = 0
-        self.s4 = 0
+        self.s1 = initalScore
+        self.s2 = initalScore
+        self.s3 = initalScore
+        self.s4 = initalScore
