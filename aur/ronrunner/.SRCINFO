@@ -1,0 +1,11 @@
+pkgbase = ronrunner
+	pkgdesc = Ron Runner - Une description courte
+	pkgver = 1.0_beta1
+	pkgrel = 1
+	url = https://github.com/votreusername/ronrunner
+	arch = x86_64
+	license = MIT
+	source = https://github.com/votreusername/ronrunner/releases/download/v1.0_beta1/ronrunner-1.0_beta1.tar.gz
+	sha256sums = HASH_A_CALCULER
+
+pkgname = ronrunner

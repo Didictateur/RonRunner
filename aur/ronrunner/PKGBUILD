@@ -1,0 +1,18 @@
+pkgname=ronrunner
+pkgver=1.0_beta1
+pkgrel=1
+pkgdesc="Ron Runner - Une description courte"
+arch=('x86_64')
+url="https://github.com/votreusername/ronrunner"
+license=('MIT')
+source=("https://github.com/votreusername/ronrunner/releases/download/v${pkgver}/ronrunner-${pkgver}.tar.gz")
+sha256sums=('HASH_A_CALCULER')
+
+build() {
+    cd "$srcdir/$pkgname-$pkgver"
+}
+
+package() {
+    cd "$srcdir/$pkgname-$pkgver"
+    install -Dm755 usr/bin/ronrunner "$pkgdir/usr/bin/ronrunner"
+}
