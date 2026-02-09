@@ -9,18 +9,25 @@ PLAYERS: list[Player] = []
 
 # init tkinter
 root = Tk()
+root.title("🀄 RonRunner - Mahjong Tournament Scoring 🀄")
+root.geometry("800x500")
+
+# Configure style
+style = ttk.Style()
+style.theme_use('clam')
+
 frm = ttk.Frame(root, padding=10)
 frm.grid()
 
 # init ui
 
 # players
-ttk.Label(frm, text="Rank").grid(column=0, row=0)
-ttk.Label(frm, text="Player").grid(column=1, row=0)
-ttk.Label(frm, text="Score").grid(column=2, row=0)
+ttk.Label(frm, text="Rank", font=("Helvetica", 11, "bold")).grid(column=0, row=0, padx=10, pady=10)
+ttk.Label(frm, text="Player", font=("Helvetica", 11, "bold")).grid(column=1, row=0, padx=10, pady=10)
+ttk.Label(frm, text="Score", font=("Helvetica", 11, "bold")).grid(column=2, row=0, padx=10, pady=10)
 
-entry_player_name = ttk.Entry(frm, width=30)
-entry_player_name.grid(column=1, row=len(PLAYERS) + 1)
+entry_player_name = ttk.Entry(frm, width=30, font=("Helvetica", 10))
+entry_player_name.grid(column=1, row=len(PLAYERS) + 1, padx=10, pady=10)
 
 # adding player
 def addPlayer(entry: Entry):
@@ -30,8 +37,8 @@ def addPlayer(entry: Entry):
         entry.delete(0, END)
         refreshUi()
 
-btn_player_name = ttk.Button(frm, text="Add", command=lambda : addPlayer(entry_player_name))
-btn_player_name.grid(column=2, row=1 + len(PLAYERS))
+btn_player_name = ttk.Button(frm, text="➕ Add", command=lambda : addPlayer(entry_player_name))
+btn_player_name.grid(column=2, row=1 + len(PLAYERS), padx=10, pady=10)
 
 # tables
 # TODO
@@ -51,18 +58,20 @@ def refreshUi():
     # show players
     PLAYERS.sort(key=lambda p : p.score, reverse=True)
     for i in range(len(PLAYERS)):
-        ttk.Label(frm, text=f"{i+1}").grid(column=0, row=i+1)
-        playerLabel = ttk.Label(frm, text=PLAYERS[i].name)
-        playerLabel.grid(column=1, row=i+1)
-        ttk.Label(frm, text=f"{PLAYERS[i].score}").grid(column=2, row=i+1)
+        ttk.Label(frm, text=f"{i+1}", font=("Helvetica", 10, "bold"), foreground="#FF6B6B").grid(column=0, row=i+1, padx=10, pady=8)
+        playerLabel = ttk.Label(frm, text=PLAYERS[i].name, font=("Helvetica", 10), foreground="#0066CC")
+        playerLabel.grid(column=1, row=i+1, padx=10, pady=8)
+        ttk.Label(frm, text=f"{PLAYERS[i].score}", font=("Helvetica", 10, "bold"), foreground="#2ECC71").grid(column=2, row=i+1, padx=10, pady=8)
 
         # change player name
         def onClick(event, player=PLAYERS[i]):
             popup = Toplevel(root)
+            popup.title(f"Edit - {player.name}")
+            popup.geometry("300x150")
             
-            entry = ttk.Entry(popup, width=30)
+            entry = ttk.Entry(popup, width=30, font=("Helvetica", 10))
             entry.insert(0, player.name)
-            entry.grid(column=0, row=0)
+            entry.grid(column=0, row=0, padx=10, pady=10)
 
             def changeName():
                 name = entry.get()
@@ -71,8 +80,8 @@ def refreshUi():
                     entry.delete(0, END)
                     cancelTopLevel(popup)
 
-            ttk.Button(popup, text="Change", command=changeName).grid(column=1, row=0)
-            ttk.Button(popup, text="Cancel", command=lambda : cancelTopLevel(popup)).grid(column=2, row=0)
+            ttk.Button(popup, text="✓ Change", command=changeName).grid(column=1, row=0, padx=5, pady=10)
+            ttk.Button(popup, text="✕ Cancel", command=lambda : cancelTopLevel(popup)).grid(column=2, row=0, padx=5, pady=10)
 
         playerLabel.bind("<Button-1>", onClick)
 
