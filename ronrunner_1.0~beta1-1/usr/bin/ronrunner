@@ -12,12 +12,48 @@ root = Tk()
 root.title("🀄 RonRunner - Mahjong Tournament Scoring 🀄")
 root.geometry("800x500")
 
-# Configure style
+# configure style
 style = ttk.Style()
 style.theme_use('clam')
 
-frm = ttk.Frame(root, padding=10)
-frm.grid()
+# configure scrollbar
+canvas = Canvas(root, highlightthickness=0)
+scrollbar = ttk.Scrollbar(root, orient='vertical', command=canvas.yview)
+scrollbarFrame = ttk.Frame(canvas)
+scrollbarFrame.bind(
+    "<Configure>",
+    lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+)
+
+canvas.create_window((0, 0), window=scrollbarFrame, anchor="nw")
+canvas.configure(yscrollcommand=scrollbar.set)
+
+canvas.grid(column=0, row=0, sticky="nsew")
+scrollbar.grid(column=1, row=0, sticky="ns")
+
+root.grid_rowconfigure(0, weight=1)
+root.grid_columnconfigure(0, weight=1)
+
+frm = scrollbarFrame
+
+# activate scrollbar with pad/mouse
+def _on_mousewheel(event):
+    canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+def _on_scroll_up(event):
+    canvas.yview_scroll(-1, "units")
+
+def _on_scroll_down(event):
+    canvas.yview_scroll(1, "units")
+
+def _bind_mousewheel(widget):
+    widget.bind("<MouseWheel>", _on_mousewheel)
+    widget.bind("<Button-4>", _on_scroll_up)
+    widget.bind("<Button-5>", _on_scroll_down)
+    for child in widget.winfo_children():
+        _bind_mousewheel(child)
+
+_bind_mousewheel(frm)
 
 # init ui
 
