@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 from tkinter import *
 from tkinter import ttk
+from math import inf
 
 from player import Player
 from table import Table
 
 PLAYERS: list[Player] = []
 TABLES: list[Table] = []
+ID_TABLES = 1
 
 INITIAL_SCORE = 30000
 UMA1 = 15000
@@ -85,9 +87,6 @@ btn_player_name.grid(column=2, row=len(PLAYERS) + 1, padx=10, pady=10)
 
 # tables
 
-# show tables
-
-
 # create table
 def addTable():
     popup = Toplevel(root)
@@ -131,7 +130,9 @@ def addTable():
             p4 = next((p for p in PLAYERS if p.name == p4_name), None)
 
             if len(set([p1, p2, p3, p4])) == 4:
-                TABLES.append(Table(p1, p2, p3, p4, INITIAL_SCORE))
+                global ID_TABLES
+                TABLES.append(Table(ID_TABLES, p1, p2, p3, p4, INITIAL_SCORE))
+                ID_TABLES += 1
                 cancelTopLevel(popup)
     
     ttk.Button(popup, text="✓ Create", command=createTable).grid(column=1, row=4, padx=10, pady=20)
@@ -139,9 +140,6 @@ def addTable():
 
 btn_create_table = ttk.Button(frm, text="➕ Create table", command=addTable)
 btn_create_table.grid(column=1, row=len(PLAYERS) + 2, padx=10, pady=20)
-
-# table history
-# TODO
 
 # refresh ui
 def refreshUi():
@@ -183,9 +181,17 @@ def refreshUi():
                     player.name = name
                     entry.delete(0, END)
                     cancelTopLevel(popup)
+            
+            def deletePlayer():
+                for t in TABLES:
+                    if player.name in [t.p1.name, t.p2.name, t.p3.name, t.p4.name]:
+                        return
+                PLAYERS.remove(player)
+                cancelTopLevel(popup)
 
             ttk.Button(popup, text="✓ Change", command=changeName).grid(column=1, row=0, padx=5, pady=10)
             ttk.Button(popup, text="✕ Cancel", command=lambda : cancelTopLevel(popup)).grid(column=2, row=0, padx=5, pady=10)
+            ttk.Button(popup, text="⊘ Delete", command=deletePlayer).grid(column=3, row=0, padx=5, pady=10)
 
         playerLabel.bind("<Button-1>", onClick)
 
@@ -212,7 +218,7 @@ def refreshUi():
             colour = "#3CEB2C"
         style.configure("Table.TLabelframe", borderwidth=2, relief="solid", bordercolor=colour)
 
-        tableFrame = ttk.LabelFrame(frm, text=f"Table {i+1}", padding=10, style="Table.TLabelframe")
+        tableFrame = ttk.LabelFrame(frm, text=f"Table {table.id}", padding=10, style="Table.TLabelframe")
         tableFrame.grid(column=col, row=row, padx=10, pady=10, sticky="ew")
 
         ttk.Label(tableFrame, text=f"{table.p1.name} : {table.s1}", font=("Helvetica", 9)).pack()
@@ -292,9 +298,14 @@ def refreshUi():
                         table.s3 = s3
                         table.s4 = s4
                         cancelTopLevel(popup)
+
+            def deleteTable():
+                TABLES.remove(table)
+                cancelTopLevel(popup)
             
             ttk.Button(popup, text="✓ Ok", command=changeTable).grid(column=1, row=4, padx=10, pady=20)
             ttk.Button(popup, text="✕ Cancel", command=lambda : cancelTopLevel(popup)).grid(column=2, row=4, padx=10, pady=20)
+            ttk.Button(popup, text="⊘ Delete", command=deleteTable).grid(column=3, row=4, padx=5, pady=10)
 
         tableFrame.bind("<Button-1>", onClick)
         for child in tableFrame.winfo_children():
@@ -306,12 +317,14 @@ def refreshUi():
 def cancelTopLevel(tl: Toplevel):
     tl.destroy()
     refreshUi()
-
 def updateScore():
     for p in PLAYERS:
-        p.score = 0
+        p.score = -inf
 
     for t in TABLES:
+        for pp in [t.p1, t.p2, t.p3, t.p4]:
+            if pp.score == -inf:
+                pp.score = 0
         scores = [
             (t.p1, t.s1),
             (t.p2, t.s2),
