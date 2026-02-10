@@ -138,8 +138,8 @@ def addTable():
     p3_var = StringVar(value="Select player 3")
     p4_var = StringVar(value="Select player 4")
 
-    # names list
-    names = [p.name for p in PLAYERS]
+    # names list sorted alphabetically
+    names = sorted([p.name for p in PLAYERS])
 
     ttk.Label(popup, text="Player 1", font=("Segoe UI", 10)).grid(column=0, row=0, padx=12, pady=12)
     combo1 = ttk.Combobox(popup, textvariable=p1_var, values=names, state="readonly", width=25)
@@ -308,8 +308,8 @@ def refreshUi():
             p3_var = StringVar(value=table.p3.name)
             p4_var = StringVar(value=table.p4.name)
 
-            # names list
-            names = [p.name for p in PLAYERS]
+            # names list sorted alphabetically
+            names = sorted([p.name for p in PLAYERS])
 
             ttk.Label(popup, text="Player 1", font=("Segoe UI", 10)).grid(column=0, row=0, padx=10, pady=10)
             combo1 = ttk.Combobox(popup, textvariable=p1_var, values=names, state="readonly", width=20)
