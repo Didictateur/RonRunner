@@ -17,7 +17,18 @@ RonRunner is a lightweight tournament scoring application for Mahjong.
 - Python 3.8+
 - Tkinter
 
-### Linux (Arch)
+### Package Managers (Recommended)
+
+#### Arch Linux (AUR)
+
+With `yay`:
+```bash
+yay -S ronrunner
+```
+
+### From Source
+
+#### Linux (Arch)
 
 ```bash
 sudo pacman -S python python-tkinter
@@ -27,7 +38,7 @@ chmod +x ronrunner_1.0~beta1-1/usr/bin/ronrunner
 ./ronrunner_1.0~beta1-1/usr/bin/ronrunner
 ```
 
-### Linux (Debian/Ubuntu)
+#### Linux (Debian/Ubuntu)
 
 ```bash
 sudo apt install python3 python3-tk
@@ -37,7 +48,7 @@ chmod +x ronrunner_1.0~beta1-1/usr/bin/ronrunner
 ./ronrunner_1.0~beta1-1/usr/bin/ronrunner
 ```
 
-### Linux (Fedora)
+#### Linux (Fedora)
 
 ```bash
 sudo dnf install python3 python3-tkinter
