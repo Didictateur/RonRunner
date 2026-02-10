@@ -19,16 +19,47 @@ UMA4 = -15000
 # init tkinter
 root = Tk()
 root.title("🀄 RonRunner - Mahjong Tournament Scoring 🀄")
-root.geometry("800x500")
+root.geometry("1000x700")
+
+# Color scheme (Modern dark theme)
+BG_PRIMARY = "#1e1e2e"
+BG_SECONDARY = "#2a2a3e"
+BG_TERTIARY = "#3a3a4e"
+FG_PRIMARY = "#ffffff"
+FG_SECONDARY = "#a0a0b0"
+ACCENT_PRIMARY = "#6366f1"
+ACCENT_SECONDARY = "#8b5cf6"
+SUCCESS_COLOR = "#10b981"
+ERROR_COLOR = "#ef4444"
+WARNING_COLOR = "#f97316"
 
 # configure style
 style = ttk.Style()
 style.theme_use('clam')
 
+root.configure(bg=BG_PRIMARY)
+style.configure("TFrame", background=BG_PRIMARY, foreground=FG_PRIMARY)
+style.configure("TLabel", background=BG_PRIMARY, foreground=FG_PRIMARY, font=("Segoe UI", 10))
+style.configure("Title.TLabel", background=BG_PRIMARY, foreground=FG_PRIMARY, font=("Segoe UI", 16, "bold"))
+style.configure("Header.TLabel", background=BG_PRIMARY, foreground=FG_PRIMARY, font=("Segoe UI", 12, "bold"))
+style.configure("TButton", font=("Segoe UI", 10, "bold"), padding=8)
+style.map("TButton", background=[("active", ACCENT_SECONDARY), ("pressed", "#4f46e5")])
+style.configure("TEntry", fieldbackground=BG_TERTIARY, foreground=FG_PRIMARY, font=("Segoe UI", 10), padding=6)
+style.configure("TCombobox", fieldbackground=BG_TERTIARY, foreground=FG_PRIMARY, font=("Segoe UI", 10), arrowcolor=ACCENT_PRIMARY)
+style.map("TCombobox", fieldbackground=[("readonly", BG_TERTIARY)], foreground=[("readonly", FG_PRIMARY)])
+style.configure("Placeholder.TCombobox", foreground=FG_SECONDARY)
+
+# Function to style popups
+def style_popup(popup):
+    popup.configure(bg=BG_PRIMARY)
+    for widget in popup.winfo_children():
+        if isinstance(widget, (Label, Entry)):
+            widget.configure(bg=BG_PRIMARY)
+
 # configure scrollbar
-canvas = Canvas(root, highlightthickness=0)
+canvas = Canvas(root, bg=BG_PRIMARY, highlightthickness=0)
 scrollbar = ttk.Scrollbar(root, orient='vertical', command=canvas.yview)
-scrollbarFrame = ttk.Frame(canvas)
+scrollbarFrame = Frame(canvas, bg=BG_PRIMARY)
 scrollbarFrame.bind(
     "<Configure>",
     lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
@@ -67,15 +98,15 @@ _bind_mousewheel(frm)
 # init ui
 
 # players
-ttk.Label(frm, text="Rank", font=("Helvetica", 11, "bold")).grid(column=0, row=0, padx=10, pady=10)
-ttk.Label(frm, text="Player", font=("Helvetica", 11, "bold")).grid(column=1, row=0, padx=10, pady=10)
-ttk.Label(frm, text="Score", font=("Helvetica", 11, "bold")).grid(column=2, row=0, padx=10, pady=10)
+ttk.Label(frm, text="Rank", font=("Segoe UI", 12, "bold"), foreground=ACCENT_PRIMARY).grid(column=0, row=0, padx=15, pady=15)
+ttk.Label(frm, text="Player", font=("Segoe UI", 12, "bold"), foreground=ACCENT_PRIMARY).grid(column=1, row=0, padx=15, pady=15)
+ttk.Label(frm, text="Score", font=("Segoe UI", 12, "bold"), foreground=ACCENT_PRIMARY).grid(column=2, row=0, padx=15, pady=15)
 
-entry_player_name = ttk.Entry(frm, width=30, font=("Helvetica", 10))
-entry_player_name.grid(column=1, row=len(PLAYERS) + 1, padx=10, pady=10)
+entry_player_name = ttk.Entry(frm, width=30)
+entry_player_name.grid(column=1, row=len(PLAYERS) + 1, padx=15, pady=12)
 
-error_add_player = ttk.Label(frm, text="", font=('Helvetica', 9), foreground="#F02A2A")
-error_add_player.grid(column=1, row=len(PLAYERS) + 2, padx=10, pady=10)
+error_add_player = ttk.Label(frm, text="", font=('Segoe UI', 9), foreground=ERROR_COLOR)
+error_add_player.grid(column=1, row=len(PLAYERS) + 2, padx=15, pady=10)
 
 # adding player
 def addPlayer(entry: Entry):
@@ -91,7 +122,7 @@ def addPlayer(entry: Entry):
     refreshUi()
 
 btn_player_name = ttk.Button(frm, text="➕ Add", command=lambda : addPlayer(entry_player_name))
-btn_player_name.grid(column=2, row=len(PLAYERS) + 1, padx=10, pady=10)
+btn_player_name.grid(column=2, row=len(PLAYERS) + 1, padx=15, pady=12)
 
 # tables
 
@@ -99,7 +130,8 @@ btn_player_name.grid(column=2, row=len(PLAYERS) + 1, padx=10, pady=10)
 def addTable():
     popup = Toplevel(root)
     popup.title("Create a new table")
-    popup.geometry("300x250")
+    popup.geometry("350x280")
+    style_popup(popup)
 
     p1_var = StringVar(value="Select player 1")
     p2_var = StringVar(value="Select player 2")
@@ -109,21 +141,21 @@ def addTable():
     # names list
     names = [p.name for p in PLAYERS]
 
-    ttk.Label(popup, text="Player 1", font=("Helvetica", 10)).grid(column=0, row=0, padx=10, pady=10)
+    ttk.Label(popup, text="Player 1", font=("Segoe UI", 10)).grid(column=0, row=0, padx=12, pady=12)
     combo1 = ttk.Combobox(popup, textvariable=p1_var, values=names, state="readonly", width=25)
-    combo1.grid(column=1, row=0, padx=10, pady=5)
+    combo1.grid(column=1, row=0, padx=12, pady=8)
 
-    ttk.Label(popup, text="Player 2", font=("Helvetica", 10)).grid(column=0, row=1, padx=10, pady=10)
+    ttk.Label(popup, text="Player 2", font=("Segoe UI", 10)).grid(column=0, row=1, padx=12, pady=12)
     combo2 = ttk.Combobox(popup, textvariable=p2_var, values=names, state="readonly", width=25)
-    combo2.grid(column=1, row=1, padx=10, pady=5)
+    combo2.grid(column=1, row=1, padx=12, pady=8)
 
-    ttk.Label(popup, text="Player 3", font=("Helvetica", 10)).grid(column=0, row=2, padx=10, pady=10)
+    ttk.Label(popup, text="Player 3", font=("Segoe UI", 10)).grid(column=0, row=2, padx=12, pady=12)
     combo3 = ttk.Combobox(popup, textvariable=p3_var, values=names, state="readonly", width=25)
-    combo3.grid(column=1, row=2, padx=10, pady=5)
+    combo3.grid(column=1, row=2, padx=12, pady=8)
 
-    ttk.Label(popup, text="Player 4", font=("Helvetica", 10)).grid(column=0, row=3, padx=10, pady=10)
+    ttk.Label(popup, text="Player 4", font=("Segoe UI", 10)).grid(column=0, row=3, padx=12, pady=12)
     combo4 = ttk.Combobox(popup, textvariable=p4_var, values=names, state="readonly", width=25)
-    combo4.grid(column=1, row=3, padx=10, pady=5)
+    combo4.grid(column=1, row=3, padx=12, pady=8)
 
     def createTable():
         p1_name = p1_var.get()
@@ -143,14 +175,14 @@ def addTable():
                 ID_TABLES += 1
                 cancelTopLevel(popup)
     
-    ttk.Button(popup, text="✓ Create", command=createTable).grid(column=1, row=4, padx=10, pady=20)
-    ttk.Button(popup, text="✕ Cancel", command=lambda : cancelTopLevel(popup)).grid(column=2, row=4, padx=10, pady=20)
+    ttk.Button(popup, text="✓ Create", command=createTable).grid(column=1, row=4, padx=12, pady=20)
+    ttk.Button(popup, text="✕ Cancel", command=lambda : cancelTopLevel(popup)).grid(column=2, row=4, padx=12, pady=20)
 
 btn_create_table = ttk.Button(frm, text="➕ Create table", command=addTable)
 btn_create_table.grid(
     column=1,
     row=len(PLAYERS) + 2,
-    padx=10,
+    padx=15,
     pady=20
 )
 
@@ -174,23 +206,24 @@ def refreshUi():
     # show players
     PLAYERS.sort(key=lambda p : p.score, reverse=True)
     for i in range(len(PLAYERS)):
-        ttk.Label(frm, text=f"{i+1}", font=("Helvetica", 10, "bold"), foreground="#FF6B6B").grid(column=0, row=i+1, padx=10, pady=8)
-        playerLabel = ttk.Label(frm, text=PLAYERS[i].name, font=("Helvetica", 10), foreground="#0066CC")
-        playerLabel.grid(column=1, row=i+1, padx=10, pady=8)
-        ttk.Label(frm, text=f"{PLAYERS[i].score}", font=("Helvetica", 10, "bold"), foreground="#2ECC71").grid(column=2, row=i+1, padx=10, pady=8)
+        ttk.Label(frm, text=f"{i+1}", font=("Segoe UI", 11, "bold"), foreground=ACCENT_PRIMARY).grid(column=0, row=i+1, padx=15, pady=12)
+        playerLabel = ttk.Label(frm, text=PLAYERS[i].name, font=("Segoe UI", 10), foreground=FG_PRIMARY)
+        playerLabel.grid(column=1, row=i+1, padx=15, pady=12)
+        ttk.Label(frm, text=f"{PLAYERS[i].score}", font=("Segoe UI", 11, "bold"), foreground=SUCCESS_COLOR).grid(column=2, row=i+1, padx=15, pady=12)
 
         # change player name
         def onClick(event, player=PLAYERS[i]):
             popup = Toplevel(root)
             popup.title(f"Edit - {player.name}")
-            popup.geometry("300x150")
+            popup.geometry("340x170")
+            style_popup(popup)
             
-            entry = ttk.Entry(popup, width=30, font=("Helvetica", 10))
+            entry = ttk.Entry(popup, width=30)
             entry.insert(0, player.name)
-            entry.grid(column=0, row=0, padx=10, pady=10)
+            entry.grid(column=0, row=0, columnspan=4, padx=12, pady=12)
 
-            error_change_player = ttk.Label(popup, text="", font=('Helvetica', 9), foreground="#F02A2A")
-            error_change_player.grid(column=0, row=1, padx=10, pady=10)
+            error_change_player = ttk.Label(popup, text="", font=('Segoe UI', 9), foreground=ERROR_COLOR)
+            error_change_player.grid(column=0, row=1, columnspan=4, padx=12, pady=10)
 
             def changeName():
                 name = entry.get()
@@ -212,28 +245,30 @@ def refreshUi():
                 PLAYERS.remove(player)
                 cancelTopLevel(popup)
 
-            ttk.Button(popup, text="✓ Change", command=changeName).grid(column=1, row=0, padx=5, pady=10)
-            ttk.Button(popup, text="✕ Cancel", command=lambda : cancelTopLevel(popup)).grid(column=2, row=0, padx=5, pady=10)
-            ttk.Button(popup, text="⊘ Delete", command=deletePlayer).grid(column=3, row=0, padx=5, pady=10)
+
+            ttk.Button(popup, text="✓ Change", command=changeName).grid(column=0, row=2, padx=6, pady=10)
+            ttk.Button(popup, text="✕ Cancel", command=lambda : cancelTopLevel(popup)).grid(column=1, row=2, padx=6, pady=10)
+            ttk.Button(popup, text="⊘ Delete", command=deletePlayer).grid(column=2, row=2, padx=6, pady=10)
 
         playerLabel.bind("<Button-1>", onClick)
 
     # adding player
     entry_player_name.grid(column=1, row=len(PLAYERS) + 1)
     btn_player_name.grid(column=2, row=len(PLAYERS) + 1)
-    error_add_player.grid(column=1, row=len(PLAYERS) + 2, padx=10, pady=10)
+    error_add_player.grid(column=1, row=len(PLAYERS) + 2, padx=15, pady=10)
 
     # show tables
     ttk.Label(
         frm,
         text="Tables",
-        font=("Helvetica", 12, "bold")
+        font=("Segoe UI", 14, "bold"),
+        foreground=ACCENT_PRIMARY
     ).grid(
         column=0,
         row=len(PLAYERS) + 3 + int(error_add_player.cget("text") != ""),
         columnspan=3,
-        padx=10,
-        pady=20
+        padx=15,
+        pady=25
     )
 
     for i, table in enumerate(TABLES):
@@ -245,25 +280,28 @@ def refreshUi():
         style.theme_use('clam')
 
         if (table.s1 + table.s2 + table.s3 + table.s4 != 4 * INITIAL_SCORE):
-            colour = "#F13C3C"
+            colour = ERROR_COLOR
         elif ([table.s1, table.s2, table.s3, table.s4] == [INITIAL_SCORE] * 4):
-            colour = "#F1933C"
+            colour = WARNING_COLOR
         else:
-            colour = "#3CEB2C"
-        style.configure("Table.TLabelframe", borderwidth=2, relief="solid", bordercolor=colour)
+            colour = SUCCESS_COLOR
+        
+        style.configure("Table.TLabelframe", background=BG_PRIMARY, foreground=FG_PRIMARY, borderwidth=2, relief="solid")
+        style.configure("Table.TLabelframe.Label", background=BG_PRIMARY, foreground=FG_PRIMARY)
+        
+        tableFrame = ttk.LabelFrame(frm, text=f"Table {table.id}", padding=12, style="Table.TLabelframe")
+        tableFrame.grid(column=col, row=row, padx=12, pady=12, sticky="ew")
 
-        tableFrame = ttk.LabelFrame(frm, text=f"Table {table.id}", padding=10, style="Table.TLabelframe")
-        tableFrame.grid(column=col, row=row, padx=10, pady=10, sticky="ew")
-
-        ttk.Label(tableFrame, text=f"{table.p1.name} : {table.s1}", font=("Helvetica", 9)).pack()
-        ttk.Label(tableFrame, text=f"{table.p2.name} : {table.s2}", font=("Helvetica", 9)).pack()
-        ttk.Label(tableFrame, text=f"{table.p3.name} : {table.s3}", font=("Helvetica", 9)).pack()
-        ttk.Label(tableFrame, text=f"{table.p4.name} : {table.s4}", font=("Helvetica", 9)).pack()
+        Label(tableFrame, text=f"{table.p1.name} : {table.s1}", font=("Segoe UI", 9), foreground=FG_PRIMARY, bg=BG_PRIMARY).pack(anchor="w")
+        Label(tableFrame, text=f"{table.p2.name} : {table.s2}", font=("Segoe UI", 9), foreground=FG_PRIMARY, bg=BG_PRIMARY).pack(anchor="w")
+        Label(tableFrame, text=f"{table.p3.name} : {table.s3}", font=("Segoe UI", 9), foreground=FG_PRIMARY, bg=BG_PRIMARY).pack(anchor="w")
+        Label(tableFrame, text=f"{table.p4.name} : {table.s4}", font=("Segoe UI", 9), foreground=FG_PRIMARY, bg=BG_PRIMARY).pack(anchor="w")
 
         def onClick(event, table=table):
             popup = Toplevel(root)
             popup.title(f"Edit table")
-            popup.geometry("300x250")
+            popup.geometry("500x280")
+            style_popup(popup)
 
             p1_var = StringVar(value=table.p1.name)
             p2_var = StringVar(value=table.p2.name)
@@ -273,31 +311,31 @@ def refreshUi():
             # names list
             names = [p.name for p in PLAYERS]
 
-            ttk.Label(popup, text="Player 1", font=("Helvetica", 10)).grid(column=0, row=0, padx=10, pady=10)
-            combo1 = ttk.Combobox(popup, textvariable=p1_var, values=names, state="readonly", width=25)
-            combo1.grid(column=1, row=0, padx=10, pady=5)
-            entry1 = ttk.Entry(popup, width=30, font=("Helvetica", 10))
+            ttk.Label(popup, text="Player 1", font=("Segoe UI", 10)).grid(column=0, row=0, padx=10, pady=10)
+            combo1 = ttk.Combobox(popup, textvariable=p1_var, values=names, state="readonly", width=20)
+            combo1.grid(column=1, row=0, padx=10, pady=8)
+            entry1 = ttk.Entry(popup, width=12)
             entry1.insert(0, table.s1)
             entry1.grid(column=2, row=0, padx=10, pady=10)
 
-            ttk.Label(popup, text="Player 2", font=("Helvetica", 10)).grid(column=0, row=1, padx=10, pady=10)
-            combo2 = ttk.Combobox(popup, textvariable=p2_var, values=names, state="readonly", width=25)
-            combo2.grid(column=1, row=1, padx=10, pady=5)
-            entry2 = ttk.Entry(popup, width=30, font=("Helvetica", 10))
+            ttk.Label(popup, text="Player 2", font=("Segoe UI", 10)).grid(column=0, row=1, padx=10, pady=10)
+            combo2 = ttk.Combobox(popup, textvariable=p2_var, values=names, state="readonly", width=20)
+            combo2.grid(column=1, row=1, padx=10, pady=8)
+            entry2 = ttk.Entry(popup, width=12)
             entry2.insert(0, table.s2)
             entry2.grid(column=2, row=1, padx=10, pady=10)
 
-            ttk.Label(popup, text="Player 3", font=("Helvetica", 10)).grid(column=0, row=2, padx=10, pady=10)
-            combo3 = ttk.Combobox(popup, textvariable=p3_var, values=names, state="readonly", width=25)
-            combo3.grid(column=1, row=2, padx=10, pady=5)
-            entry3 = ttk.Entry(popup, width=30, font=("Helvetica", 10))
+            ttk.Label(popup, text="Player 3", font=("Segoe UI", 10)).grid(column=0, row=2, padx=10, pady=10)
+            combo3 = ttk.Combobox(popup, textvariable=p3_var, values=names, state="readonly", width=20)
+            combo3.grid(column=1, row=2, padx=10, pady=8)
+            entry3 = ttk.Entry(popup, width=12)
             entry3.insert(0, table.s3)
             entry3.grid(column=2, row=2, padx=10, pady=10)
 
-            ttk.Label(popup, text="Player 4", font=("Helvetica", 10)).grid(column=0, row=3, padx=10, pady=10)
-            combo4 = ttk.Combobox(popup, textvariable=p4_var, values=names, state="readonly", width=25)
-            combo4.grid(column=1, row=3, padx=10, pady=5)
-            entry4 = ttk.Entry(popup, width=30, font=("Helvetica", 10))
+            ttk.Label(popup, text="Player 4", font=("Segoe UI", 10)).grid(column=0, row=3, padx=10, pady=10)
+            combo4 = ttk.Combobox(popup, textvariable=p4_var, values=names, state="readonly", width=20)
+            combo4.grid(column=1, row=3, padx=10, pady=8)
+            entry4 = ttk.Entry(popup, width=12)
             entry4.insert(0, table.s4)
             entry4.grid(column=2, row=3, padx=10, pady=10)
 
@@ -339,7 +377,7 @@ def refreshUi():
             
             ttk.Button(popup, text="✓ Ok", command=changeTable).grid(column=1, row=4, padx=10, pady=20)
             ttk.Button(popup, text="✕ Cancel", command=lambda : cancelTopLevel(popup)).grid(column=2, row=4, padx=10, pady=20)
-            ttk.Button(popup, text="⊘ Delete", command=deleteTable).grid(column=3, row=4, padx=5, pady=10)
+            ttk.Button(popup, text="⊘ Delete", command=deleteTable).grid(column=3, row=4, padx=10, pady=20)
 
         tableFrame.bind("<Button-1>", onClick)
         for child in tableFrame.winfo_children():
@@ -349,7 +387,7 @@ def refreshUi():
     btn_create_table.grid(
         column=1,
         row=len(PLAYERS) + 2 + int(error_add_player.cget("text") != ""),
-        padx=10,
+        padx=15,
         pady=20
     )
 
