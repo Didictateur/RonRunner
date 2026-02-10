@@ -74,13 +74,21 @@ ttk.Label(frm, text="Score", font=("Helvetica", 11, "bold")).grid(column=2, row=
 entry_player_name = ttk.Entry(frm, width=30, font=("Helvetica", 10))
 entry_player_name.grid(column=1, row=len(PLAYERS) + 1, padx=10, pady=10)
 
+error_add_player = ttk.Label(frm, text="", font=('Helvetica', 9), foreground="#F02A2A")
+error_add_player.grid(column=1, row=len(PLAYERS) + 2, padx=10, pady=10)
+
 # adding player
 def addPlayer(entry: Entry):
     txt = entry.get()
-    if txt and not txt in [p.name for p in PLAYERS]:
+    if not txt:
+        error_add_player.config(text="No name inserted")
+    elif txt in [p.name for p in PLAYERS]:
+        error_add_player.config(text=f"Player {txt} already exists")
+    else:
+        error_add_player.config(text="")
         PLAYERS.append(Player(txt))
         entry.delete(0, END)
-        refreshUi()
+    refreshUi()
 
 btn_player_name = ttk.Button(frm, text="➕ Add", command=lambda : addPlayer(entry_player_name))
 btn_player_name.grid(column=2, row=len(PLAYERS) + 1, padx=10, pady=10)
@@ -139,7 +147,12 @@ def addTable():
     ttk.Button(popup, text="✕ Cancel", command=lambda : cancelTopLevel(popup)).grid(column=2, row=4, padx=10, pady=20)
 
 btn_create_table = ttk.Button(frm, text="➕ Create table", command=addTable)
-btn_create_table.grid(column=1, row=len(PLAYERS) + 2, padx=10, pady=20)
+btn_create_table.grid(
+    column=1,
+    row=len(PLAYERS) + 2,
+    padx=10,
+    pady=20
+)
 
 # refresh ui
 def refreshUi():
@@ -151,7 +164,8 @@ def refreshUi():
         if widget not in [
             entry_player_name,
             btn_player_name,
-            btn_create_table
+            btn_create_table,
+            error_add_player
         ]:
             info = widget.grid_info()
             if info.get('row', 0) > 0 and info.get('row', 0) < 100:
@@ -175,9 +189,17 @@ def refreshUi():
             entry.insert(0, player.name)
             entry.grid(column=0, row=0, padx=10, pady=10)
 
+            error_change_player = ttk.Label(popup, text="", font=('Helvetica', 9), foreground="#F02A2A")
+            error_change_player.grid(column=0, row=1, padx=10, pady=10)
+
             def changeName():
                 name = entry.get()
-                if name and not name in [p.name for p in PLAYERS]:
+                if not name:
+                    error_change_player.config(text="No name inserted")
+                elif name in [p.name for p in PLAYERS]:
+                    error_change_player.config(text=f"Player {name} already exists")
+                else:
+                    error_change_player.config(text="")
                     player.name = name
                     entry.delete(0, END)
                     cancelTopLevel(popup)
@@ -185,6 +207,7 @@ def refreshUi():
             def deletePlayer():
                 for t in TABLES:
                     if player.name in [t.p1.name, t.p2.name, t.p3.name, t.p4.name]:
+                        error_change_player.config(text=f"Cannot delete: player still in table {t.id}")
                         return
                 PLAYERS.remove(player)
                 cancelTopLevel(popup)
@@ -198,14 +221,25 @@ def refreshUi():
     # adding player
     entry_player_name.grid(column=1, row=len(PLAYERS) + 1)
     btn_player_name.grid(column=2, row=len(PLAYERS) + 1)
+    error_add_player.grid(column=1, row=len(PLAYERS) + 2, padx=10, pady=10)
 
     # show tables
-    ttk.Label(frm, text="Tables", font=("Helvetica", 12, "bold")).grid(column=0, row=len(PLAYERS) + 3, columnspan=3, padx=10, pady=20)
+    ttk.Label(
+        frm,
+        text="Tables",
+        font=("Helvetica", 12, "bold")
+    ).grid(
+        column=0,
+        row=len(PLAYERS) + 3 + int(error_add_player.cget("text") != ""),
+        columnspan=3,
+        padx=10,
+        pady=20
+    )
 
     for i, table in enumerate(TABLES):
         nbCol = 4
         col = i % nbCol
-        row = len(PLAYERS) + 4 + (i // nbCol)
+        row = len(PLAYERS) + 4 + (i // nbCol) + int(error_add_player.cget("text") != "")
 
         style = ttk.Style()
         style.theme_use('clam')
@@ -312,7 +346,12 @@ def refreshUi():
             child.bind("<Button-1>", onClick)
 
     # adding table
-    btn_create_table.grid(column=1, row=len(PLAYERS) + 2, padx=10, pady=20)
+    btn_create_table.grid(
+        column=1,
+        row=len(PLAYERS) + 2 + int(error_add_player.cget("text") != ""),
+        padx=10,
+        pady=20
+    )
 
 def cancelTopLevel(tl: Toplevel):
     tl.destroy()
