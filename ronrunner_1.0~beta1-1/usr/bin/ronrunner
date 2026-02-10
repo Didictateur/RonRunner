@@ -271,10 +271,14 @@ def refreshUi():
         pady=25
     )
 
+    tables_row = len(PLAYERS) + 4 + int(error_add_player.cget("text") != "")
+    tables_frame = Frame(frm, bg=BG_PRIMARY)
+    tables_frame.grid(column=0, row=tables_row, columnspan=3, sticky="ew", padx=15, pady=12)
+
     for i, table in enumerate(TABLES):
         nbCol = 4
         col = i % nbCol
-        row = len(PLAYERS) + 4 + (i // nbCol) + int(error_add_player.cget("text") != "")
+        table_row = i // nbCol
 
         style = ttk.Style()
         style.theme_use('clam')
@@ -289,8 +293,8 @@ def refreshUi():
         style.configure("Table.TLabelframe", background=BG_PRIMARY, foreground=FG_PRIMARY, borderwidth=2, relief="solid")
         style.configure("Table.TLabelframe.Label", background=BG_PRIMARY, foreground=FG_PRIMARY)
         
-        tableFrame = ttk.LabelFrame(frm, text=f"Table {table.id}", padding=12, style="Table.TLabelframe")
-        tableFrame.grid(column=col, row=row, padx=12, pady=12, sticky="ew")
+        tableFrame = ttk.LabelFrame(tables_frame, text=f"Table {table.id}", padding=12, style="Table.TLabelframe")
+        tableFrame.grid(column=col, row=table_row, padx=12, pady=12, sticky="ew")
 
         Label(tableFrame, text=f"{table.p1.name} : {table.s1}", font=("Segoe UI", 9), foreground=FG_PRIMARY, bg=BG_PRIMARY).pack(anchor="w")
         Label(tableFrame, text=f"{table.p2.name} : {table.s2}", font=("Segoe UI", 9), foreground=FG_PRIMARY, bg=BG_PRIMARY).pack(anchor="w")
