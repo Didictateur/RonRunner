@@ -1,8 +1,21 @@
 Package: ronrunner
-Version: 1.0~beta1-1
-Section: utils
+Version: 1.0.0
+Section: games
 Priority: optional
 Architecture: all
-Depends: python3
-Maintainer: Didictateur
-Description: RonRunner
+Depends: python3 (>= 3.8), python3-tk
+Recommends: 
+Suggests: 
+Maintainer: Didictateur decosse.adrien@cosmoris.fr
+Homepage: https://github.com/Didictateur/RonRunner
+Description: Lightweight tournament scoring application for Mahjong
+ RonRunner is a simple and fast Mahjong tournament scoring tool
+ featuring player management, table creation, and automatic score
+ calculation with ranking.
+ .
+ Features:
+  - Add and manage players
+  - Create and edit tournament tables
+  - Automatic score calculation with ranking
+  - Dark modern UI with Segoe UI fonts
+  - Lightweight and fast

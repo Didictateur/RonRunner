@@ -1,0 +1,35 @@
+name: Build and Publish Snap
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build snap
+        uses: snapcore/action-build@v1
+        id: snapcraft
+        with:
+          snapcraft-args: snap
+          path: .
+
+      - name: Upload snap to Snap Store
+        uses: snapcore/action-publish@v1
+        with:
+          snap: ${{ steps.snapcraft.outputs.snap }}
+          release: candidate
+          store-login: ${{ secrets.STORE_LOGIN }}
+
+      - name: Publish to stable
+        if: ${{ github.event.release.prerelease == false }}
+        uses: snapcore/action-publish@v1
+        with:
+          snap: ${{ steps.snapcraft.outputs.snap }}
+          release: stable
+          store-login: ${{ secrets.STORE_LOGIN }}
